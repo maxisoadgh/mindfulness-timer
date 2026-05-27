@@ -6,6 +6,15 @@ let audioCtx = null;
 function getAudioCtx() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Limiter: prevents clipping when partials sum
+        var comp = audioCtx.createDynamicsCompressor();
+        comp.threshold.value = -18;
+        comp.knee.value = 6;
+        comp.ratio.value = 8;
+        comp.attack.value = 0.003;
+        comp.release.value = 0.25;
+        comp.connect(audioCtx.destination);
+        audioCtx._master = comp;
     }
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -15,7 +24,7 @@ function getAudioCtx() {
 
 // Synthesizes a Tibetan singing bowl bell using harmonic oscillators
 function playBell(ctx, startTime, volume) {
-    volume = volume !== undefined ? volume : 0.7;
+    volume = volume !== undefined ? volume : 0.38;
     // Harmonic ratios typical of a metal bowl
     var partials = [
         { freq: 220,   vol: 1.0 },
@@ -35,7 +44,7 @@ function playBell(ctx, startTime, volume) {
         gain.gain.linearRampToValueAtTime(p.vol * volume, startTime + 0.015);
         gain.gain.exponentialRampToValueAtTime(0.0001, startTime + decayTime);
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(ctx._master);
         osc.start(startTime);
         osc.stop(startTime + decayTime + 0.1);
     });
@@ -45,7 +54,7 @@ function playStartBells() {
     var ctx = getAudioCtx();
     var now = ctx.currentTime;
     [0, 1.6, 3.2].forEach(function(t) {
-        playBell(ctx, now + t, 0.7);
+        playBell(ctx, now + t, 0.38);
     });
 }
 
@@ -53,7 +62,7 @@ function playEndBells() {
     var ctx = getAudioCtx();
     var now = ctx.currentTime;
     [0, 2.8, 6.0].forEach(function(t, i) {
-        playBell(ctx, now + t, 0.55 - i * 0.08);
+        playBell(ctx, now + t, 0.32 - i * 0.05);
     });
 }
 
