@@ -1,0 +1,16 @@
+# Servidor de desarrollo local
+serve.py
+cert.pem
+key.pem
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

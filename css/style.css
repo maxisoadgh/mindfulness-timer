@@ -1,0 +1,376 @@
+:root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #263348;
+    --gold: #c4b068;
+    --gold-dim: #8a7a48;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --border: #334155;
+    --glow: rgba(196, 176, 104, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overscroll-behavior: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+    padding-top: max(env(safe-area-inset-top), 20px);
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+}
+
+.app {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+/* Timer display */
+.timer-ring {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    flex-shrink: 0;
+}
+
+.timer-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.ring-bg {
+    fill: none;
+    stroke: var(--bg3);
+    stroke-width: 6;
+}
+
+.ring-progress {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
+}
+
+.ring-progress.finished {
+    stroke: var(--gold-dim);
+}
+
+.timer-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.timer-display {
+    font-size: 3.2rem;
+    font-weight: 200;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    line-height: 1;
+}
+
+.timer-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+/* Presets */
+.presets {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.preset-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.preset-btn:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+}
+
+.preset-btn.active {
+    background: var(--glow);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* Custom time */
+.custom-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 8px 16px;
+    transition: border-color 0.2s;
+}
+
+.custom-row.active {
+    border-color: var(--gold);
+}
+
+.custom-row label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.custom-row input[type="number"] {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    width: 52px;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.custom-row input[type="number"]::-webkit-inner-spin-button,
+.custom-row input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.custom-row .unit {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.custom-stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-left: 4px;
+}
+
+.custom-stepper button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 22px;
+    height: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.15s;
+}
+
+.custom-stepper button:hover {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.btn-main {
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    border-radius: 50%;
+    width: 68px;
+    height: 68px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 20px rgba(196, 176, 104, 0.3);
+    flex-shrink: 0;
+}
+
+.btn-main:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(196, 176, 104, 0.45);
+}
+
+.btn-main:active {
+    transform: scale(0.97);
+}
+
+.btn-main:disabled {
+    opacity: 0.4;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-secondary:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+}
+
+.btn-secondary:active {
+    transform: scale(0.95);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.3;
+    cursor: default;
+    transform: none;
+}
+
+/* Status message */
+.status {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: center;
+    min-height: 1.1em;
+    transition: color 0.4s;
+}
+
+.status.active {
+    color: var(--gold);
+}
+
+/* Wake lock indicator */
+.wakelock-indicator {
+    position: fixed;
+    top: max(env(safe-area-inset-top), 12px);
+    right: max(env(safe-area-inset-right), 14px);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--bg3);
+    transition: background 0.4s;
+}
+
+.wakelock-indicator.on {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+/* Finished overlay */
+.finished-glow {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(196, 176, 104, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.finished-glow.show {
+    opacity: 1;
+}
+
+/* Animations */
+@keyframes pulse-ring {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.timer-ring.running .ring-progress {
+    animation: pulse-ring 4s ease-in-out infinite;
+}
+
+/* Landscape compact */
+@media (max-height: 500px) and (orientation: landscape) {
+    .app {
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: 600px;
+        gap: 16px;
+        justify-content: center;
+    }
+    .timer-ring {
+        width: 160px;
+        height: 160px;
+    }
+    .timer-display {
+        font-size: 2.4rem;
+    }
+    .header {
+        width: 100%;
+    }
+}

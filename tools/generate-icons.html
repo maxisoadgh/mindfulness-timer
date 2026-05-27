@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generar íconos — Mindfulness Timer</title>
+<style>
+  body { font-family: sans-serif; background: #1e293b; color: #e2e8f0; padding: 24px; }
+  h1 { margin-bottom: 16px; }
+  .canvases { display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
+  canvas { border-radius: 22%; display: block; }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  button {
+    background: #c4b068; color: #0f172a; border: none; padding: 10px 20px;
+    border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;
+  }
+  button:hover { opacity: 0.85; }
+  p { color: #94a3b8; font-size: 0.85rem; margin-top: 12px; }
+</style>
+</head>
+<body>
+<h1>Generar íconos</h1>
+<p>Hace clic en cada botón para descargar el PNG correspondiente. Guardarlo en <code>../icons/</code></p>
+
+<div class="canvases">
+  <div>
+    <canvas id="c512" width="512" height="512"></canvas>
+    <p style="text-align:center">512×512</p>
+  </div>
+  <div>
+    <canvas id="c192" width="192" height="192"></canvas>
+    <p style="text-align:center">192×192</p>
+  </div>
+  <div>
+    <canvas id="c180" width="180" height="180"></canvas>
+    <p style="text-align:center">180×180 (iOS)</p>
+  </div>
+</div>
+
+<div class="actions">
+  <button onclick="download('c512','icon-512.png')">⬇ Descargar icon-512.png</button>
+  <button onclick="download('c192','icon-192.png')">⬇ Descargar icon-192.png</button>
+  <button onclick="download('c180','apple-touch-icon.png')">⬇ Descargar apple-touch-icon.png</button>
+</div>
+
+<script>
+function drawBowl(canvas) {
+  var s = canvas.width;
+  var ctx = canvas.getContext('2d');
+  var cx = s / 2, cy = s / 2, r = s * 0.42;
+
+  // Background
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, s, s);
+
+  var gold = '#c4b068';
+  var goldDim = 'rgba(196,176,104,0.35)';
+
+  // Outer glow
+  var grd = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 1.1);
+  grd.addColorStop(0, 'rgba(196,176,104,0.12)');
+  grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, s, s);
+
+  ctx.lineWidth = s * 0.025;
+  ctx.strokeStyle = gold;
+  ctx.lineCap = 'round';
+
+  // Bowl body — ellipse bottom
+  ctx.beginPath();
+  var bx = cx, by = cy + r * 0.18;
+  var bw = r * 1.15, bh = r * 0.52;
+  ctx.ellipse(bx, by, bw, bh, 0, Math.PI * 0.05, Math.PI * 0.95);
+  ctx.stroke();
+
+  // Bowl rim
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - r * 0.28, r * 1.12, r * 0.22, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Bowl sides
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 1.12, cy - r * 0.28);
+  ctx.quadraticCurveTo(cx - r * 1.25, cy + r * 0.05, cx - bw, by);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(cx + r * 1.12, cy - r * 0.28);
+  ctx.quadraticCurveTo(cx + r * 1.25, cy + r * 0.05, cx + bw, by);
+  ctx.stroke();
+
+  // Striker stick
+  ctx.strokeStyle = goldDim;
+  ctx.lineWidth = s * 0.018;
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.15, cy - r * 0.28);
+  ctx.lineTo(cx - r * 0.35, cy - r * 1.05);
+  ctx.stroke();
+
+  // Ripple lines above bowl
+  ctx.strokeStyle = 'rgba(196,176,104,0.3)';
+  ctx.lineWidth = s * 0.012;
+  [0.62, 0.75, 0.88].forEach(function(rr) {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy - r * 0.28, r * rr, r * 0.08, 0, Math.PI, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy - r * 0.28, s * 0.018, 0, Math.PI * 2);
+  ctx.fillStyle = gold;
+  ctx.fill();
+}
+
+['c512','c192','c180'].forEach(function(id) {
+  var c = document.getElementById(id);
+  drawBowl(c);
+});
+
+function download(canvasId, filename) {
+  var c = document.getElementById(canvasId);
+  var a = document.createElement('a');
+  a.href = c.toDataURL('image/png');
+  a.download = filename;
+  a.click();
+}
+</script>
+</body>
+</html>

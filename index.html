@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mindfulness Timer</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mindfulness">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <!-- Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="finished-glow" id="finishedGlow"></div>
+<div class="wakelock-indicator" id="wakeLockIndicator" title="Pantalla activa"></div>
+
+<main class="app">
+
+    <header class="header">
+        <h1>Mindfulness Timer</h1>
+    </header>
+
+    <!-- Ring timer -->
+    <div class="timer-ring" id="timerRing">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring-bg" cx="100" cy="100" r="90"/>
+            <circle class="ring-progress" id="ringProgress" cx="100" cy="100" r="90"/>
+        </svg>
+        <div class="timer-center">
+            <div class="timer-display" id="timerDisplay">10:00</div>
+            <div class="timer-label" id="timerLabel"></div>
+        </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="presets">
+        <button class="preset-btn" data-mins="5">5 min</button>
+        <button class="preset-btn" data-mins="10">10 min</button>
+        <button class="preset-btn" data-mins="15">15 min</button>
+        <button class="preset-btn" data-mins="20">20 min</button>
+    </div>
+
+    <!-- Custom time -->
+    <div class="custom-row" id="customRow">
+        <label for="customInput">Personalizado</label>
+        <input
+            type="number"
+            id="customInput"
+            min="1"
+            max="180"
+            placeholder="—"
+            inputmode="numeric"
+            pattern="[0-9]*"
+        >
+        <span class="unit">min</span>
+        <div class="custom-stepper">
+            <button id="stepUp" aria-label="Aumentar minutos">▲</button>
+            <button id="stepDown" aria-label="Disminuir minutos">▼</button>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn-secondary" id="btnReset" aria-label="Reiniciar">↺</button>
+        <button class="btn-main" id="btnStart" aria-label="Iniciar">▶</button>
+        <div style="width:48px"></div>
+    </div>
+
+    <div class="status" id="statusMsg"></div>
+
+</main>
+
+<script src="js/app.js"></script>
+</body>
+</html>
