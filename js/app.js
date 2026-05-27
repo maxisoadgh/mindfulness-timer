@@ -6,15 +6,19 @@ let audioCtx = null;
 function getAudioCtx() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        // Limiter: prevents clipping when partials sum
+        // Hard limiter: ratio 20:1, fast attack to catch transients
         var comp = audioCtx.createDynamicsCompressor();
-        comp.threshold.value = -18;
-        comp.knee.value = 6;
-        comp.ratio.value = 8;
-        comp.attack.value = 0.003;
-        comp.release.value = 0.25;
+        comp.threshold.value = -6;
+        comp.knee.value = 3;
+        comp.ratio.value = 20;
+        comp.attack.value = 0.001;
+        comp.release.value = 0.15;
+        // Master gain before limiter keeps headroom
+        var master = audioCtx.createGain();
+        master.gain.value = 0.55;
+        master.connect(comp);
         comp.connect(audioCtx.destination);
-        audioCtx._master = comp;
+        audioCtx._master = master;
     }
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -24,27 +28,30 @@ function getAudioCtx() {
 
 // Synthesizes a Tibetan singing bowl bell using harmonic oscillators
 function playBell(ctx, startTime, volume) {
-    volume = volume !== undefined ? volume : 0.38;
-    // Harmonic ratios typical of a metal bowl
+    volume = volume !== undefined ? volume : 0.5;
+    // 3 partials only — fewer oscillators summing = less clipping risk
     var partials = [
-        { freq: 220,   vol: 1.0 },
-        { freq: 440,   vol: 0.5 },
-        { freq: 605,   vol: 0.3 },
-        { freq: 880,   vol: 0.15 },
-        { freq: 1100,  vol: 0.08 }
+        { freq: 220,  vol: 1.0 },
+        { freq: 440,  vol: 0.35 },
+        { freq: 605,  vol: 0.15 }
     ];
-    var decayTime = 4.5;
+    var decayTime = 5.0;
+
+    // Single envelope node shared by all partials — avoids per-partial transients
+    var env = ctx.createGain();
+    env.gain.setValueAtTime(0, startTime);
+    env.gain.linearRampToValueAtTime(volume, startTime + 0.05);
+    env.gain.exponentialRampToValueAtTime(0.0001, startTime + decayTime);
+    env.connect(ctx._master);
 
     partials.forEach(function(p) {
         var osc = ctx.createOscillator();
         var gain = ctx.createGain();
         osc.type = 'sine';
         osc.frequency.value = p.freq;
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(p.vol * volume, startTime + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + decayTime);
+        gain.gain.value = p.vol;
         osc.connect(gain);
-        gain.connect(ctx._master);
+        gain.connect(env);
         osc.start(startTime);
         osc.stop(startTime + decayTime + 0.1);
     });
