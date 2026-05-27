@@ -6,18 +6,10 @@ let audioCtx = null;
 function getAudioCtx() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        // Hard limiter: ratio 20:1, fast attack to catch transients
-        var comp = audioCtx.createDynamicsCompressor();
-        comp.threshold.value = -6;
-        comp.knee.value = 3;
-        comp.ratio.value = 20;
-        comp.attack.value = 0.001;
-        comp.release.value = 0.15;
-        // Master gain before limiter keeps headroom
+        // Simple master gain — sin compresor, que agrega distorsión propia a ratio alto
         var master = audioCtx.createGain();
-        master.gain.value = 0.55;
-        master.connect(comp);
-        comp.connect(audioCtx.destination);
+        master.gain.value = 0.3;
+        master.connect(audioCtx.destination);
         audioCtx._master = master;
     }
     if (audioCtx.state === 'suspended') {
@@ -28,19 +20,21 @@ function getAudioCtx() {
 
 // Synthesizes a Tibetan singing bowl bell using harmonic oscillators
 function playBell(ctx, startTime, volume) {
-    volume = volume !== undefined ? volume : 0.5;
-    // 3 partials only — fewer oscillators summing = less clipping risk
+    volume = volume !== undefined ? volume : 0.6;
+    // Frecuencias de bol tibetano agudo — evita graves que vibran en parlantes de celular
+    // Ratios inarmónicos típicos: 1× / 2.75× / 5.0×
+    // Parciales normalizados (suma = 1.0) para que env.gain == pico real de señal
     var partials = [
-        { freq: 220,  vol: 1.0 },
-        { freq: 440,  vol: 0.35 },
-        { freq: 605,  vol: 0.15 }
+        { freq: 432,   vol: 0.68 },
+        { freq: 1188,  vol: 0.24 },
+        { freq: 2160,  vol: 0.08 }
     ];
     var decayTime = 5.0;
 
-    // Single envelope node shared by all partials — avoids per-partial transients
+    // Un solo nodo de envolvente para todas las parciales
     var env = ctx.createGain();
     env.gain.setValueAtTime(0, startTime);
-    env.gain.linearRampToValueAtTime(volume, startTime + 0.05);
+    env.gain.linearRampToValueAtTime(volume, startTime + 0.06);
     env.gain.exponentialRampToValueAtTime(0.0001, startTime + decayTime);
     env.connect(ctx._master);
 
